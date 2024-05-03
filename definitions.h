@@ -22,6 +22,7 @@ typedef enum {
   TAG_MINOR,
   TAG_SUSPENDED,
   TAG_DIMINISHED,
+  TAG_AUGMENTED,
   // ...  
 } HarmTag;
 

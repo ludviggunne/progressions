@@ -94,7 +94,7 @@ void pick_next_chord(ChordState *curr)
   {
     case TAG_MAJOR:
     {
-      int case_ = RRANGE(0, 9);
+      int case_ = RRANGE(0, 10);
       fprintf(stderr, "major, case %d\n", case_);
       switch (case_)
       {
@@ -143,6 +143,11 @@ void pick_next_chord(ChordState *curr)
           TRP(+5, +4, +4);
           next.tag = TAG_DIMINISHED;
           break;
+        case 9:
+          // Raise fifth
+          TRP(+0, +0, +1);
+          next.tag = TAG_AUGMENTED;
+          break;
         default:
           PANIC("case out of range");
       }
@@ -150,7 +155,7 @@ void pick_next_chord(ChordState *curr)
     }
     case TAG_MINOR:
     {
-      int case_ = RRANGE(0, 9);
+      int case_ = RRANGE(0, 10);
       fprintf(stderr, "minor, case %d\n", case_);
       switch (case_)
       {
@@ -198,6 +203,11 @@ void pick_next_chord(ChordState *curr)
           // Add high sixth
           TRP(-3, -3, -4);
           next.tag = TAG_DIMINISHED;
+          break;
+        case 9:
+          // Lower base
+          TRP(-1, +0, +0);
+          next.tag = TAG_AUGMENTED;
           break;
         default:
           PANIC("case out of range");
@@ -260,6 +270,32 @@ void pick_next_chord(ChordState *curr)
           // Resolve low one down
           TRP(-1, +0, +0);
           next.tag = TAG_MAJOR;
+          break;
+        default:
+          PANIC("case out of range");
+      }
+      break;
+    }
+    case TAG_AUGMENTED:
+    {
+      int case_ = RRANGE(0, 3);
+      fprintf(stderr, "augmented, case %d\n", case_);
+      switch (case_)
+      {
+        case 0:
+          // Resolve high fifth to sixth
+          TRP(+9, +8, +8);
+          next.tag = TAG_MINOR;
+          break;
+        case 1:
+          // Resolve base down to make major chord
+          TRP(+4, +4, +3);
+          next.tag = TAG_MAJOR;
+          break;
+        case 2:
+          // Resolve middle up to make minor chord
+          TRP(+5, +4, +4);
+          next.tag = TAG_MINOR;
           break;
         default:
           PANIC("case out of range");
