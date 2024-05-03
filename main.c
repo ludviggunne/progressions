@@ -79,10 +79,17 @@ int main(int argc, char *argv[])
   midi_destroy(&mid);
 }
 
+
 void pick_next_chord(ChordState *curr)
 {
+#define TRP(_0, _1, _2)\
+  next.real_chord[0] = PCLS_WRAP(curr->real_chord[0] + _0);\
+  next.real_chord[1] = PCLS_WRAP(curr->real_chord[1] + _1);\
+  next.real_chord[2] = PCLS_WRAP(curr->real_chord[2] + _2)
+
   ChordState next;
 
+  fprintf(stderr, "tag: %d\n", curr->tag);
   switch (curr->tag)
   {
     case TAG_MAJOR:
@@ -93,34 +100,23 @@ void pick_next_chord(ChordState *curr)
       {
         case 0:
           // Transpose major chord a whole step down
-          next.real_chord[0] = PCLS_WRAP(curr->real_chord[0] - 2);
-          next.real_chord[1] = PCLS_WRAP(curr->real_chord[1] - 2);
-          next.real_chord[2] = PCLS_WRAP(curr->real_chord[2] - 2);
+          TRP(-2, -2, -2);
           next.tag = TAG_MAJOR;
-          // ===================================================
           break;
         case 1:
           // Transpose major chord a whole step down, make minor
-          next.real_chord[0] = PCLS_WRAP(curr->real_chord[0] - 2);
-          next.real_chord[1] = PCLS_WRAP(curr->real_chord[1] - 3);
-          next.real_chord[2] = PCLS_WRAP(curr->real_chord[2] - 2);
+          TRP(-2, -3, -2);
           next.tag = TAG_MINOR;
-          // ===================================================
+          break;
         case 2:
           // Transpose a minor third up
-          next.real_chord[0] = PCLS_WRAP(curr->real_chord[0] + 3);
-          next.real_chord[1] = PCLS_WRAP(curr->real_chord[1] + 3);
-          next.real_chord[2] = PCLS_WRAP(curr->real_chord[2] + 3);
+          TRP(+3, +3, +3);
           next.tag = TAG_MAJOR;
-          // ===================================================
           break;
         case 3:
           // Transpose a major third up, make minor
-          next.real_chord[0] = PCLS_WRAP(curr->real_chord[0] + 4);
-          next.real_chord[1] = PCLS_WRAP(curr->real_chord[1] + 3);
-          next.real_chord[2] = PCLS_WRAP(curr->real_chord[2] + 4);
+          TRP(+4, +3, +4);
           next.tag = TAG_MINOR;
-          // ===================================================
           break;
         default:
           PANIC("case out of range");
@@ -135,38 +131,28 @@ void pick_next_chord(ChordState *curr)
       {
         case 0:
           // Transpose minor chord a major third down
-          next.real_chord[0] = PCLS_WRAP(curr->real_chord[0] - 4);
-          next.real_chord[1] = PCLS_WRAP(curr->real_chord[1] - 4);
-          next.real_chord[2] = PCLS_WRAP(curr->real_chord[2] - 4);
+          TRP(-4, -4, -4);
           next.tag = TAG_MINOR;
-          // ===================================================
           break;
         case 1:
           // Transpose minor chord a fourth, make major
-          next.real_chord[0] = PCLS_WRAP(curr->real_chord[0] + 5);
-          next.real_chord[1] = PCLS_WRAP(curr->real_chord[1] + 6);
-          next.real_chord[2] = PCLS_WRAP(curr->real_chord[2] + 5);
+          TRP(+5, +6, +5);
           next.tag = TAG_MAJOR;
-          // ===================================================
+          break;
         case 2:
           // Transpose a fourth down
-          next.real_chord[0] = PCLS_WRAP(curr->real_chord[0] - 4);
-          next.real_chord[1] = PCLS_WRAP(curr->real_chord[1] - 4);
-          next.real_chord[2] = PCLS_WRAP(curr->real_chord[2] - 4);
+          TRP(-5, -5, -5);
           next.tag = TAG_MINOR;
-          // ===================================================
           break;
         case 3:
           // Transpose a whole step down, make major
-          next.real_chord[0] = PCLS_WRAP(curr->real_chord[0] - 2);
-          next.real_chord[1] = PCLS_WRAP(curr->real_chord[1] - 1);
-          next.real_chord[2] = PCLS_WRAP(curr->real_chord[2] - 2);
+          TRP(-2, -1, -2);
           next.tag = TAG_MAJOR;
-          // ===================================================
           break;
         default:
           PANIC("case out of range");
       }
+      break;
     }
     default:
       PANIC("tag out of range");
@@ -174,6 +160,7 @@ void pick_next_chord(ChordState *curr)
 
   // Make the chord "travel the least distance"
   int perm = lsd(curr->real_chord, next.real_chord);
+  fprintf(stderr, "optimal permutation: %d\n", perm);
   permute(next.chord, next.real_chord, perm);
   chst_copy(curr, &next);
 }
