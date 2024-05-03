@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define PANIC() assert(0 && __FILE__ && __LINE__)
+#define PANIC(msg) assert(0 && msg)
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 // Random int in range [min, max)
 #define RRANGE(min, max) ((min) + (rand() % ((max - min))))

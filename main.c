@@ -123,7 +123,7 @@ void pick_next_chord(ChordState *curr)
           // ===================================================
           break;
         default:
-          PANIC();
+          PANIC("case out of range");
       }
       break;
     }
@@ -165,10 +165,11 @@ void pick_next_chord(ChordState *curr)
           // ===================================================
           break;
         default:
-          PANIC();
+          PANIC("case out of range");
       }
     }
-    break;
+    default:
+      PANIC("tag out of range");
   }
 
   // Make the chord "travel the least distance"
