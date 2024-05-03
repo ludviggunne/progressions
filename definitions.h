@@ -20,6 +20,8 @@ typedef uint8_t PitchClass;
 typedef enum {
   TAG_MAJOR,
   TAG_MINOR,
+  TAG_SUSPENDED,
+  TAG_DIMINISHED,
   // ...  
 } HarmTag;
 

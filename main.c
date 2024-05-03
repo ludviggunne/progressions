@@ -7,7 +7,7 @@
 #define VEL    96
 #define DIV    2048
 #define LEN    (DIV << 1)
-#define NCHRDS 24
+#define NCHRDS 32
 
 const uint8_t base_oct = 3;
 const uint8_t oct[3] = { 4, 5, 6 };
@@ -94,8 +94,8 @@ void pick_next_chord(ChordState *curr)
   {
     case TAG_MAJOR:
     {
-      int case_ = RRANGE(0, 4);
-      fprintf(stderr, "minor, case %d\n", case_);
+      int case_ = RRANGE(0, 9);
+      fprintf(stderr, "major, case %d\n", case_);
       switch (case_)
       {
         case 0:
@@ -118,6 +118,31 @@ void pick_next_chord(ChordState *curr)
           TRP(+4, +3, +4);
           next.tag = TAG_MINOR;
           break;
+        case 4:
+          // Transpose to dominant, suspended
+          TRP(-5, -4, -5);
+          next.tag = TAG_SUSPENDED;
+          break;
+        case 5:
+          // Transpose a whole step up, suspended
+          TRP(+2, +3, +2);
+          next.tag = TAG_SUSPENDED;
+          break;
+        case 6:
+          // Make suspended
+          TRP(+0, +1, +0);
+          next.tag = TAG_SUSPENDED;
+          break;
+        case 7:
+          // Make dominant without one
+          TRP(+4, +3, +3);
+          next.tag = TAG_DIMINISHED;
+          break;
+        case 8:
+          // To dominant with low nine
+          TRP(+5, +4, +4);
+          next.tag = TAG_DIMINISHED;
+          break;
         default:
           PANIC("case out of range");
       }
@@ -125,7 +150,7 @@ void pick_next_chord(ChordState *curr)
     }
     case TAG_MINOR:
     {
-      int case_ = RRANGE(0, 4);
+      int case_ = RRANGE(0, 9);
       fprintf(stderr, "minor, case %d\n", case_);
       switch (case_)
       {
@@ -147,6 +172,93 @@ void pick_next_chord(ChordState *curr)
         case 3:
           // Transpose a whole step down, make major
           TRP(-2, -1, -2);
+          next.tag = TAG_MAJOR;
+          break;
+        case 4:
+          // Transpose to dominant, suspended
+          TRP(-5, -3, -5);
+          next.tag = TAG_SUSPENDED;
+          break;
+        case 5:
+          // Transpose to subdominant, suspended
+          TRP(+5, +7, +5);
+          next.tag = TAG_SUSPENDED;
+          break;
+        case 6:
+          // Make suspended
+          TRP(+0, +2, +0);
+          next.tag = TAG_SUSPENDED;
+          break;
+        case 7:
+          // Lower fifth
+          TRP(+0, +0, -1);
+          next.tag = TAG_DIMINISHED;
+          break;
+        case 8:
+          // Add high sixth
+          TRP(-3, -3, -4);
+          next.tag = TAG_DIMINISHED;
+          break;
+        default:
+          PANIC("case out of range");
+      }
+      break;
+    }
+    case TAG_SUSPENDED:
+    {
+      int case_ = RRANGE(0, 4);
+      fprintf(stderr, "suspended, case %d\n", case_);
+      switch (case_)
+      {
+        case 0:
+          // Release, fourth goes to major third
+          TRP(+0, -1, +0);
+          next.tag = TAG_MAJOR;
+          break;
+        case 1:
+          // Release, fourth goes to minor third
+          TRP(+0, -2, +0);
+          next.tag = TAG_MINOR;
+          break;
+        case 2:
+          // Release, fifth goes to major third
+          TRP(+5, +4, +5);
+          next.tag = TAG_MAJOR;
+          break;
+        case 3:
+          // Release, fifth goes to minor third
+          TRP(+5, +3, +5);
+          next.tag = TAG_MINOR;
+          break;
+        default:
+          PANIC("case out of range");
+      }
+      break;
+    }
+    case TAG_DIMINISHED:
+    {
+      int case_ = RRANGE(0, 4);
+      fprintf(stderr, "diminished, case %d\n", case_);
+      switch (case_)
+      {
+        case 0:
+          // Make major on same base note
+          TRP(+0, +1, +1);
+          next.tag = TAG_MAJOR;
+          break;
+        case 1:
+          // Treat as D7<9 resolve to minor
+          TRP(-5, -5, -4);
+          next.tag = TAG_MINOR;
+          break;
+        case 2:
+          // Treat as D7 resolve to major
+          TRP(+1, +2, +2);
+          next.tag = TAG_MAJOR;
+          break;
+        case 3:
+          // Resolve low one down
+          TRP(-1, +0, +0);
           next.tag = TAG_MAJOR;
           break;
         default:
